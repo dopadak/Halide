@@ -351,6 +351,9 @@ public:
     GeneratorFactoryProvider &operator=(GeneratorFactoryProvider &&) = delete;
 };
 
+/** Return a GeneratorFactoryProvider that knows about all the currently-registered C++ Generators. */
+const GeneratorFactoryProvider &get_registered_generators();
+
 /** generate_filter_main() is a convenient wrapper for GeneratorRegistry::create() +
  * compile_to_files(); it can be trivially wrapped by a "real" main() to produce a
  * command-line utility for ahead-of-time filter compilation. */
@@ -3945,8 +3948,6 @@ public:
 
 // -----------------------------
 
-using GeneratorParamsMap = std::map<std::string, std::string>;
-
 /** ExecuteGeneratorArgs is the set of arguments to execute_generator().
  */
 struct ExecuteGeneratorArgs {
@@ -4023,6 +4024,18 @@ void execute_generator(const ExecuteGeneratorArgs &args);
 // -----------------------------
 
 }  // namespace Internal
+
+/** Create a Generator from the currently-registered Generators, use it to create a Callable.
+ * Any GeneratorParams specified will be applied to the Generator before compilation.
+ * If the name isn't registered, assert-fail. */
+// @{
+Callable create_callable_from_generator(const GeneratorContext &context,
+                                        const std::string &name,
+                                        const GeneratorParamsMap &generator_params = {});
+Callable create_callable_from_generator(const Target &target,
+                                        const std::string &name,
+                                        const GeneratorParamsMap &generator_params = {});
+// @}
 
 }  // namespace Halide
 
@@ -4104,10 +4117,8 @@ struct halide_global_ns;
     namespace GEN_REGISTRY_NAME##_ns {                                                                                              \
         std::unique_ptr<Halide::Internal::AbstractGenerator> factory(const Halide::GeneratorContext &context) {                     \
             auto g = ORIGINAL_REGISTRY_NAME##_ns::factory(context);                                                                 \
-            const Halide::Internal::GeneratorParamsMap m = __VA_ARGS__;                                                             \
-            for (const auto &c : m) {                                                                                               \
-                g->set_generatorparam_value(c.first, c.second);                                                                     \
-            }                                                                                                                       \
+            const Halide::GeneratorParamsMap m = __VA_ARGS__;                                                                       \
+            g->set_generatorparam_values(m);                                                                                        \
             return g;                                                                                                               \
         }                                                                                                                           \
     }                                                                                                                               \
