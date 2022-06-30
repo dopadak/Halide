@@ -6,12 +6,18 @@ set(SCRIPTS
     local_laplacian.py)
 
 set(PY_APPS_DEPS_bilateral_grid_shell py_aot_bilateral_grid)
-set(PY_APPS_ARGS_bilateral_grid_shell ${CMAKE_CURRENT_SOURCE_DIR}/../../apps/images/gray.png ${CMAKE_CURRENT_BINARY_DIR}/out.png 0.1 10)
+set(PY_APPS_ARGS_bilateral_grid_shell ${TEST_IMAGES_DIR}/images/gray.png ${TEST_TMPDIR}/out.png 0.1 10)
 
 make_shell_path(PY_APPS_PYTHONPATH
                 "$<TARGET_FILE_DIR:py_aot_bilateral_grid>"
                 "$<TARGET_FILE_DIR:Halide::Python>"
                 )
+set(TEST_ENV
+    "PYTHONPATH=${PY_APPS_PYTHONPATH}"
+    "HL_TARGET=${Halide_TARGET}"
+    "TEST_TMPDIR=$<SHELL_PATH:${CMAKE_CURRENT_BINARY_DIR}>"
+    "TEST_IMAGES_DIR=$<SHELL_PATH:${CMAKE_CURRENT_SOURCE_DIR}/../../apps/images>"
+)
 
 foreach (SCRIPT IN LISTS SCRIPTS)
     get_filename_component(BASE ${SCRIPT} NAME_WE)
@@ -20,5 +26,5 @@ foreach (SCRIPT IN LISTS SCRIPTS)
     set_tests_properties(python_apps_${BASE} PROPERTIES
                          LABELS python
                          DEPENDS "${PY_APPS_DEPS_${BASE}}"
-                         ENVIRONMENT "PYTHONPATH=${PY_APPS_PYTHONPATH};HL_TARGET=${Halide_TARGET}")
+                         ENVIRONMENT "${TEST_ENV}")
 endforeach ()

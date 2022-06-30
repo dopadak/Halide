@@ -1,7 +1,7 @@
 import halide as hl
 
-import simple_stub
-import complex_stub
+import simple_pystub
+import complex_pystub
 
 from simplepy_generator import SimplePy
 from complexpy_generator import ComplexPy
@@ -270,9 +270,9 @@ def test_complex(cls, extra_input_name = ""):
 
 
 if __name__ == "__main__":
-    test_simple(simple_stub)
-    test_complex(complex_stub)
-    test_complex(complex_stub, extra_input_name = "foozz_input")
+    test_simple(simple_pystub)
+    test_complex(complex_pystub)
+    test_complex(complex_pystub, extra_input_name = "foozz_input")
     test_simple(SimplePy)
     test_complex(ComplexPy)
     test_complex(ComplexPy, extra_input_name = "foo_input")
