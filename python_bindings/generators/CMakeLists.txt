@@ -41,7 +41,7 @@ function(_add_python_aot_and_stub_extension)
             add_python_stub_extension(py_stub_${G}
                                       SOURCES "${ARG_SOURCES}"
                                       GENERATOR ${G}
-                                      MODULE ${G}_stub)
+                                      MODULE ${G}_pystub)
             set(_ALL_DEPS "${_ALL_DEPS} py_stub_${G}" PARENT_SCOPE)
         endif()
     endforeach()
